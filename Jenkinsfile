@@ -5,13 +5,33 @@ pipeline {
 
         stage('Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/sissor-nagi/myapp.git'
+                git url: 'https://github.com/sissor-nagi/myapp.git', branch: 'main'
             }
         }
 
-        stage('Build') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'echo "Build OK"'
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=myapp \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=sqa_3792a41d56f3ea304ec668bd4f8f2ff6829709c3
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker') {
+            steps {
+                sh 'docker build -t myapp-image .'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh 'trivy image myapp-image'
             }
         }
 
