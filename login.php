@@ -1,21 +1,21 @@
-<?php
-include "config.php";
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SUP2I Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-session_start();
+<div class="login-container">
+    <h1 class="sup2i">SUP2I</h1>
+    <h2>Connexion</h2>
 
-$username = $_POST['username'];
-$password = md5($_POST['password']);
+    <form action="auth.php" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Se connecter</button>
+    </form>
+</div>
 
-$stmt = $conn->prepare("SELECT * FROM admins WHERE username=? AND password=?");
-$stmt->bind_param("ss", $username, $password);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if ($result->num_rows == 1) {
-    $_SESSION['admin'] = $username;
-    header("Location: index.php");
-} else {
-    echo "Login incorrect";
-}
-?>
+</body>
+</html>
