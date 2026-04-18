@@ -1,40 +1,56 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['admin'])) {
-    header("Location: login.html");
-    exit;
-}
-?>
 <?php include "config.php"; ?>
 
-<h2>Gestion des utilisateurs</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SUP2I - Gestion des Étudiants</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-<h3>Ajouter utilisateur</h3>
+<body>
 
-<form method="POST" action="add.php">
-    <input type="text" name="name" placeholder="Nom" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <button type="submit">Ajouter</button>
-</form>
+<div class="container">
 
-<hr>
+    <!-- HEADER -->
+    <div class="header">
+        <h1 class="sup2i">SUP2I</h1>
+        <h2>Gestion des Étudiants</h2>
+    </div>
 
-<h3>Liste des utilisateurs</h3>
+    <!-- FORMULAIRE -->
+    <div class="card">
+        <h3>Ajouter un étudiant</h3>
 
-<?php
-$result = $conn->query("SELECT * FROM users");
-
-while($row = $result->fetch_assoc()) {
-?>
-    <p>
-        <form method="POST" action="update.php" style="display:inline;">
-            <input type="hidden" name="id" value="<?= $row['id'] ?>">
-            <input type="text" name="name" value="<?= $row['name'] ?>" required>
-            <input type="email" name="email" value="<?= $row['email'] ?>" required>
-            <button type="submit">Modifier</button>
+        <form action="add.php" method="POST">
+            <input type="text" name="name" placeholder="Nom étudiant" required>
+            <input type="email" name="email" placeholder="Email étudiant" required>
+            <button type="submit">Ajouter</button>
         </form>
+    </div>
 
-        <a href="delete.php?id=<?= $row['id'] ?>">Supprimer</a>
-    </p>
-<?php } ?>
+    <!-- LISTE -->
+    <div class="card">
+        <h3>Liste des étudiants</h3>
+
+        <?php
+        $result = $conn->query("SELECT * FROM students");
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                echo "
+                <div class='item'>
+                    <span>{$row['name']} - {$row['email']}</span>
+                    <a class='delete' href='delete.php?id={$row['id']}'>Supprimer</a>
+                </div>";
+            }
+        } else {
+            echo "<p>Aucun étudiant trouvé</p>";
+        }
+        ?>
+
+    </div>
+
+</div>
+
+</body>
+</html>
