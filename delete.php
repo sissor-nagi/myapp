@@ -3,10 +3,7 @@ include "config.php";
 
 $id = $_GET['id'];
 
-$stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
+$conn->query("DELETE FROM students WHERE id=$id");
 
 header("Location: index.php");
-exit;
 ?>
