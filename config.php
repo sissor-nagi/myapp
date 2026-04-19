@@ -1,5 +1,12 @@
 <?php
-$host = "localhost";   // IMPORTANT
+
+$host = "localhost"; // défaut Apache
+
+// Si on est dans Docker → utiliser mysql
+if (getenv('DB_HOST')) {
+    $host = getenv('DB_HOST');
+}
+
 $user = "appuser";
 $pass = "User@123Secure";
 $db   = "myapp";

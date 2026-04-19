@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    container_name: myapp
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+
+  mysql:
+    image: mysql:8
+    container_name: mydb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: User@123Secure
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # ← add this
+    ports:
+      - "3307:3306"
