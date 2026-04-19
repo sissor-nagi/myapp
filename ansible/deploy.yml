@@ -1,12 +1,51 @@
 - name: Deploy MyApp
   hosts: localhost
   become: false
-
   tasks:
 
-    - name: Run container
+    - name: Créer le réseau Docker
+      docker_network:
+        name: myapp_network
+        state: present
+
+    - name: Copier init.sql
+      copy:
+        src: ../init.sql
+        dest: /tmp/init.sql
+
+    - name: Lancer MySQL
+      docker_container:
+        name: mydb
+        image: mysql:8
+        restart_policy: always
+        networks:
+          - name: myapp_network
+        env:
+          MYSQL_ROOT_PASSWORD: "root"
+          MYSQL_DATABASE: "myapp"
+          MYSQL_USER: "appuser"
+          MYSQL_PASSWORD: "User@123Secure"
+        volumes:
+          - /tmp/init.sql:/docker-entrypoint-initdb.d/init.sql
+        ports:
+          - "3307:3306"
+
+    - name: Attendre que MySQL soit prêt
+      wait_for:
+        host: localhost
+        port: 3307
+        delay: 5
+        timeout: 60
+
+    - name: Lancer le conteneur web
       docker_container:
         name: myapp
         image: myapp-image:latest
+        restart_policy: always
+        networks:
+          - name: myapp_network
+        env:
+          DB_HOST: "mydb"        # ← nom du conteneur MySQL
         ports:
           - "8081:80"
+        image_name_mismatch: recreate   # ← supprime le warning
